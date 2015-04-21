@@ -1,4 +1,4 @@
-function J = nnCostFunction(weights,arch,X,y,lambda)
+function J = nnCostFunction(weights,arch,X,y)
   J = 0;
   
   # convert array of weights into weight matrices for each layer
