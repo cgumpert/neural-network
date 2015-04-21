@@ -7,7 +7,8 @@ function pred = predict(arch,weights,X)
     out = arch(l+1);
     w = reshape(weights(start:start+in*out-1),out,in);
     start += in*out;
-    pred = [ones(1,m); a];
-    pred = sigmoid(w*a);
+    pred = [ones(1,m); pred];
+    pred = sigmoid(w*pred);
   endfor
+  pred = pred';
 endfunction
