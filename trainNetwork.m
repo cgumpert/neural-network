@@ -1,6 +1,6 @@
 function [nn cost] = trainNetwork(X,y,arch,lambda)
   num_w = sum(arch(1:end-1) .* arch(2:end)) + sum(arch(2:end));
-  nn = zeros(1,num_w);
+  nn = zeros(num_w,1);
   cost = 0;
   start = 1;
   for l = 1:numel(arch)-1
@@ -11,6 +11,7 @@ function [nn cost] = trainNetwork(X,y,arch,lambda)
     start += in*out;
   endfor
 
+#  checkNNGradients(nn,arch,X(1:5,:),y(1:5,:),lambda);
   options = optimset('MaxIter', 20);
   costFunction = @(p) nnCostFunctionReg(p,arch,X,y,lambda);
   [nn cost] = fmincg(costFunction, nn, options);
