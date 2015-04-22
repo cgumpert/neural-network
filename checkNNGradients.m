@@ -8,14 +8,13 @@ function checkNNGradients(weights,arch,X,y,lambda)
 %   result in very similar values.
 %
 
-[cost, grad] = nnCostFunctionReg(weights,arch,X,y,lambda)
+[cost, grad] = nnCostFunctionReg(weights,arch,X,y,lambda);
 numgrad = zeros(size(weights));
 perturb = zeros(size(weights));
 e = 1e-4;
 for p = 1:numel(weights)
     % Set perturbation vector
     perturb(p) = e;
-    p
     loss1 = nnCostFunctionReg(weights - perturb,arch,X,y,lambda);
     loss2 = nnCostFunctionReg(weights + perturb,arch,X,y,lambda);
     % Compute Numerical Gradient
