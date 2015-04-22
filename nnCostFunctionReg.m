@@ -26,25 +26,22 @@ function [J grad] = nnCostFunctionReg(weights,arch,X,y,lambda)
     nabla{l} = zeros(out,in);
   endfor
   
-  costMatrix = (-y' .* log(a{end}) - (1-y') .* log(1-a{end}))/m;
-  J = sum(costMatrix(:));
+  costMatrix1 = (-y' .* log(a{end}) - (1-y') .* log(1-a{end}));
+  costMatrix = (a{end} - y').^2;
+  J = sum(costMatrix(:))/(2*m);
   J += (sum(weights(:).^2) - s_wb2)*lambda/(2*m);
 
-  for t = 1:m
-    d{end} = (a{end}(:,t) - y(t,:)');
-    d{end} = [1; d{end}];
-    for l = numel(arch)-1:-1:1
-      d{l} = w{l}' * d{l+1}(2:end) .* sigmoidGradient([1;z{l}(:,t)]);
-      nabla{l} += d{l+1}(2:end) * a{l}(:,t)'; 
-    endfor
+  d{end} = (a{end} - y') .* sigmoidGradient(z{end});
+  d{end} = [ones(1,m); d{end}];
+  ende = size(weights,1);
+  for l = numel(arch)-1:-1:1
+    d{l} = w{l}' * d{l+1}(2:end,:) .* sigmoidGradient([ones(1,m);z{l}]);
+    if isempty(nabla{l})
+      nabla{l} = zeros(arch(l+1),arch(l)+1);
+    endif
+    nabla{l} = (d{l+1}(2:end,:) * a{l}')./m; 
+    nabla{l}(:,2:end) += lambda .* w{l}(:,2:end)./m;
+    grad(ende-prod(size(nabla{l}))+1:ende) = nabla{l}(:);
+    ende -= prod(size(nabla{l}));
   endfor
-
-  start = 1;
-  for l = 1:numel(nabla)
-    nabla{l} = nabla{l} ./ m;
-    nabla{l}(:,2:end) += lambda * w{l}(:,2:end)/m;
-    grad(start:start+prod(size(nabla{l}))-1) = nabla{l}(:);
-    start += prod(size(nabla{l}));
-  endfor
-  
 endfunction
