@@ -33,33 +33,13 @@ function [J, grad] = CrossEntropy(X,y,arch,weights,lambda = 0)
     # calculate prediction and store intermediated activations and
     # weight matrices for gradient calculation
 
-    # initialise delta matrices for each layer
-    d = cell(numel(arch),1);
-    nabla = cell(numel(arch)-1,1);
-
     # get prediction and intermediate values from feed-forward propagation
     [y_pred, z, a, w] = predict(X,arch,weights);
 
     # calculate delta for output layer
-    d{end} = (a{end} - y'); # .* sigmoidGradient(z{end});
-    d{end} = [ones(1,m); d{end}];
-
-    # helper variable for unrolling gradient matrices
-    ende = size(weights,1);
-    # perform backward propagation
-    for l = numel(arch)-1:-1:1
-      # calculate delta for layer l
-      d{l} = w{l}' * d{l+1}(2:end,:) .* sigmoidGradient([ones(1,m);z{l}]);
-      # calculate gradient with respect to weights in this  layer
-      nabla{l} = (d{l+1}(2:end,:) * a{l}')./m;
-      # add regularisation term
-      if (lambda > 0)
-	nabla{l}(:,2:end) += lambda .* w{l}(:,2:end)./m;
-      endif
-      # unroll gradient matrix
-      grad(ende-prod(size(nabla{l}))+1:ende) = nabla{l}(:);
-      ende -= prod(size(nabla{l}));
-    endfor
+    delta = (a{end} - y');
+    # calculate gradient using backpropagation
+    grad = backpropagate(arch,delta,w,z,a,lambda,@sigmoidGradient);
   else
     # wrong number of output values
     print_usage();
