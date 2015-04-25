@@ -14,7 +14,7 @@ function [y, z, a, w] = predict(X,arch,weights)
 %       z{l+1} = w{l} * a{l}	 
 % a ... cell array (dim = numel(arch) x 1) containing the activations for each layer
 %	a{l} = [ones(1,m); sigmoid(z{l})]
-% W ... cell array (dim = (numel(arch) - 1) x 1) containing the weight matrices for each layer
+% w ... cell array (dim = (numel(arch) - 1) x 1) containing the weight matrices for each layer
 %       dim w{l} = arch(l+1) x (arch(l) + 1)
 %
 % current implementation only supports calling the function with either one or four return values	 
