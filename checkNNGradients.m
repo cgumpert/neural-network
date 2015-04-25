@@ -1,40 +1,42 @@
-function checkNNGradients(weights,arch,X,y,lambda)
-%CHECKNNGRADIENTS Creates a small neural network to check the
-%backpropagation gradients
-%   CHECKNNGRADIENTS(lambda) Creates a small neural network to check the
-%   backpropagation gradients, it will output the analytical gradients
-%   produced by your backprop code and the numerical gradients (computed
-%   using computeNumericalGradient). These two gradient computations should
-%   result in very similar values.
+function diff = checkNNGradients(fcn,args)
+%function diff = checkNNGradients(fcn,args)
 %
+%performs a numerical check of the gradient 
+%
+%parameters:
+% fcn  ... a function handle which takes args as argument and returns [val, grad]
+%           where val is the function value and gradient the gradient with respect
+%           to the args parameters at the given parameter point
+% args ... parameter point at which the function and its gradient are evaluated
+%
+% result [diff]:
+% diff ... normalised difference of the returned gradient and the numerical computatiion
+%          norm(grad - num_grad) / norm(grad + num_grad)
+%	 
 
-[cost, grad] = nnCostFunctionReg(weights,arch,X,y,lambda);
-numgrad = zeros(size(weights));
-perturb = zeros(size(weights));
-e = 1e-4;
-for p = 1:numel(weights)
+  # intialise return values
+  diff = 0;
+
+  # get function value and gradient
+  [val, grad] = fcn(args);
+
+  # compute gradient numerically
+  numgrad = zeros(size(args));
+  perturb = zeros(size(args));
+  
+  e = 1e-4;
+  for p = 1:numel(args)
     % Set perturbation vector
     perturb(p) = e;
-    loss1 = nnCostFunctionReg(weights - perturb,arch,X,y,lambda);
-    loss2 = nnCostFunctionReg(weights + perturb,arch,X,y,lambda);
+    loss1 = fcn(args - perturb);
+    loss2 = fcn(args + perturb);
     % Compute Numerical Gradient
     numgrad(p) = (loss2 - loss1) / (2*e);
     perturb(p) = 0;
-end
+  end
 
-% Visually examine the two gradient computations.  The two columns
-% you get should be very similar. 
-disp([numgrad grad]);
-fprintf(['The above two columns you get should be very similar.\n' ...
-         '(Left-Your Numerical Gradient, Right-Analytical Gradient)\n\n']);
+  #disp([numgrad grad]);
 
-% Evaluate the norm of the difference between two solutions.  
-% If you have a correct implementation, and assuming you used EPSILON = 0.0001 
-% in computeNumericalGradient.m, then diff below should be less than 1e-9
-diff = norm(numgrad-grad)/norm(numgrad+grad);
-
-fprintf(['If your backpropagation implementation is correct, then \n' ...
-         'the relative difference will be small (less than 1e-9). \n' ...
-         '\nRelative Difference: %g\n'], diff);
-
+  # calculate normalised difference
+  diff = norm(numgrad-grad)/norm(numgrad+grad);
 end

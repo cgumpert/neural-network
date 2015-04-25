@@ -11,7 +11,7 @@ function [nn cost] = trainNetwork(X,y,arch,lambda)
     start += in*out;
   endfor
 
-#  checkNNGradients(nn,arch,X(1:5,:),y(1:5,:),lambda);
+  checkNNGradients(@(weights) CrossEntropy(X(1:5,:),y(1:5,:),arch,weights,lambda),nn)
   options = optimset('MaxIter', 20);
   costFunction = @(p) CrossEntropy(X,y,arch,p,lambda);
   [nn cost] = fmincg(costFunction, nn, options);
