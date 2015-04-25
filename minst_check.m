@@ -15,7 +15,7 @@ end
 arch = [400,25,10];
 sel = randperm(size(X, 1));
 
-displayData(X(sel(1:100), :));
+#displayData(X(sel(1:100), :));
 
 [nn, c] = trainNetwork(X,y_vec,arch,0.1);
 
